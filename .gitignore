@@ -1,0 +1,18 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Azure Functions local settings (contient des secrets)
+local.settings.json
+
+## Bicep params (contient des secrets)
+infra/parameters.bicepparam
+
+## Build output
+publish/
+
+## Logs
+*.log
