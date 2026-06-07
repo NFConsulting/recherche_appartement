@@ -7,6 +7,7 @@ public record Listing(
     decimal Price,
     int Rooms,
     decimal? Surface,
+    string? Address,
     string Arrondissement,
     string Url,
     DateTime PublishedAt

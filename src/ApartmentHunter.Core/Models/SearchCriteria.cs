@@ -11,7 +11,14 @@ public class SearchCriteria
     public bool Matches(Listing listing)
     {
         if (listing.Price < PriceMin || listing.Price > PriceMax) return false;
-        if (listing.Rooms < RoomsMin || listing.Rooms > RoomsMax) return false;
+        if (listing.Rooms > 0 && (listing.Rooms < RoomsMin || listing.Rooms > RoomsMax)) return false;
+        if (Arrondissements.Count > 0 && !string.IsNullOrEmpty(listing.Arrondissement))
+        {
+            var inZone = Arrondissements.Any(a =>
+                listing.Arrondissement.Contains(a.ToString()) ||
+                listing.Arrondissement.Contains((75000 + a).ToString()));
+            if (!inZone) return false;
+        }
         return true;
     }
 }

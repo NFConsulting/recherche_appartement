@@ -26,7 +26,7 @@ public class ApartmentCheckFunction(
         var enabledScrapers = scrapers.Where(s => s.IsEnabled).ToList();
         if (enabledScrapers.Count == 0)
         {
-            logger.LogWarning("Aucun scraper activé. Vérifiez la configuration des URLs.");
+            logger.LogWarning("Aucun scraper activé. PAP/LeBonCoin/SeLoger sont actifs par défaut. Jinka/GDC nécessitent un cookie de session.");
             return;
         }
 
@@ -34,7 +34,8 @@ public class ApartmentCheckFunction(
         var results = await Task.WhenAll(tasks);
         var allListings = results.SelectMany(x => x).ToList();
 
-        logger.LogInformation("{Count} annonces trouvées au total", allListings.Count);
+        logger.LogInformation("{Count} annonce(s) trouvée(s) au total sur {Scrapers} source(s)",
+            allListings.Count, enabledScrapers.Count);
 
         foreach (var listing in allListings)
         {
@@ -51,10 +52,26 @@ public class ApartmentCheckFunction(
 
     private static string FormatSms(Listing listing)
     {
-        var surface = listing.Surface.HasValue ? $" {listing.Surface}m²" : "";
-        var arrond = listing.Arrondissement != "Paris" ? $" ({listing.Arrondissement})" : "";
-        // SMS limité à 160 caractères
-        var message = $"[{listing.Source}] {listing.Rooms}P{surface}{arrond} - {listing.Price}€\n{listing.Url}";
-        return message.Length > 160 ? message[..157] + "..." : message;
+        var parts = new List<string>();
+
+        // Ligne 1 : source + arrondissement + surface + pièces
+        var surface = listing.Surface.HasValue ? $"{listing.Surface}m²" : null;
+        var rooms = listing.Rooms > 0 ? $"{listing.Rooms}P" : null;
+        var header = $"[{listing.Source}] {listing.Arrondissement}";
+        if (surface != null || rooms != null)
+            header += $" · {string.Join(" ", new[] { surface, rooms }.OfType<string>())}";
+        parts.Add(header);
+
+        // Ligne 2 : adresse (si disponible)
+        if (!string.IsNullOrWhiteSpace(listing.Address))
+            parts.Add(listing.Address);
+
+        // Ligne 3 : prix
+        parts.Add($"{listing.Price:N0}€/mois".Replace(",", " ").Replace(".", " "));
+
+        // Ligne 4 : URL
+        parts.Add(listing.Url);
+
+        return string.Join("\n", parts);
     }
 }
