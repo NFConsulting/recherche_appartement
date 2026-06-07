@@ -21,6 +21,11 @@ var secretMappings = new Dictionary<string, string>
     ["OVH-ServiceName"]   = "OvhSms:ServiceName",
     ["OVH-MobileNumber1"] = "OvhSms:RecipientPhoneNumbers:0",
     ["OVH-MobileNumber2"] = "OvhSms:RecipientPhoneNumbers:1",
+    // Credentials scrapers Jinka et GensDeConfiance (login automatique)
+    ["Jinka-Username"]    = "Scrapers:Jinka:Username",
+    ["Jinka-Password"]    = "Scrapers:Jinka:Password",
+    ["GDC-Username"]      = "Scrapers:GensDeConfiance:Username",
+    ["GDC-Password"]      = "Scrapers:GensDeConfiance:Password",
 };
 
 var host = new HostBuilder()
